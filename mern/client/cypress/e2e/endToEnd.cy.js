@@ -2,7 +2,10 @@
 describe('Web site availability', () => {
 
     after(() => {
-      cy.contains("Delete").click({ force: true });
+      cy.visit('http://localhost:5173');
+      cy.contains('tr', 'Employee1').within(() => {
+        cy.contains("Delete").click({ force: true });
+      });
       }); 
       it('Sanity listings web site', () => {
         cy.visit('http://localhost:5173');
@@ -17,19 +20,4 @@ describe('Web site availability', () => {
         cy.visit('http://localhost:5173');
         cy.contains('Employee1').should('exist');
       });
-     /* it('Test Editing Employee listings', () => {
-        //cy.visit('http://localhost:3000');
-        cy.contains('Edit').click({ force: true })
-        cy.on('url:changed', url => {
-                  cy.visit(url);
-                  cy.get('#position').clear();
-                  cy.get('#position').type("Position2");
-                  cy.contains("Update Record").click({ force: true });
-                  cy.visit('http://localhost:3000');
-                  cy.contains('Position2').should('exist');
-              });
-       
-        
-        
-      });*/
     });

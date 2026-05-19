@@ -40,8 +40,7 @@
     }
   },
 
-  "postCreateCommand": "cd mern/server && npm ci && cd ../client && npm ci",
-  "postStartCommand": "cd mern/server && node seed.js",
+  "postCreateCommand": "cd mern/server && npm ci && node seed.js && cd ../client && npm ci",
 
   "remoteEnv": {
     "ATLAS_URI": "mongodb://admin:mongodb@mongodb:27017/employees"
