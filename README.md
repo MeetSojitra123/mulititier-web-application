@@ -5,8 +5,11 @@ A full-stack CRUD application built with MongoDB, Express, React, and Node.js (M
 Companion code for the [MERN Stack Tutorial](https://www.mongodb.com/languages/mern-stack-tutorial?utm_campaign=devrel&utm_medium=github&utm_content=mern.stack.example&utm_term=learning.fuel) and [video walkthrough](https://www.youtube.com/watch?v=4nKWREmCvsE).
 
 [![CI](https://github.com/mongodb-developer/mern-stack-example/actions/workflows/main.yaml/badge.svg)](https://github.com/mongodb-developer/mern-stack-example/actions/workflows/main.yaml)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/mongodb-developer/mern-stack-example?style=social)](https://github.com/mongodb-developer/mern-stack-example/stargazers)
+[![GitHub issues](https://img.shields.io/github/issues/mongodb-developer/mern-stack-example)](https://github.com/mongodb-developer/mern-stack-example/issues)
 
-## MERN Stack Architecture
+## Project Overview
 
 This project demonstrates an employee record tracker:
 
@@ -16,6 +19,8 @@ This project demonstrates an employee record tracker:
 - Delete records
 
 The React app in `mern/client` calls an Express API in `mern/server`, and data is stored in MongoDB Atlas.
+
+## MERN Stack Architecture
 
 ```
 ┌─────────────────────┐       REST (JSON)      ┌──────────────────────────┐
@@ -38,73 +43,65 @@ Stack:
 - Backend: Node.js, Express 4, MongoDB Node.js Driver 6
 - Database: MongoDB Atlas (`employees.records` collection)
 
+## Project Structure
+
+```text
+mern/
+   client/   # React + Vite frontend
+   server/   # Express API + MongoDB integration
+```
+
 ## Prerequisites
 
 - Node.js 20+
 - npm 9+
 - A free [MongoDB Atlas](https://www.mongodb.com/atlas?utm_campaign=devrel&utm_medium=github&utm_content=mern.stack.example&utm_term=learning.fuel) cluster
 
-## Quick Start
+## Quick Start and MongoDB Setup
 
 ```bash
 # 1) Clone
 git clone https://github.com/mongodb-developer/mern-stack-example.git
 cd mern-stack-example
 
-# 2) Configure environment
+# 2) Create server environment file
 cp mern/server/config.env.example mern/server/config.env
+```
 
-# 3) Start API server
+Update `mern/server/config.env` with one of the following `ATLAS_URI` values:
+
+Atlas cluster:
+
+```env
+ATLAS_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/
+PORT=5050
+```
+
+If you are new to Atlas, use the [Atlas quick start guide](https://www.mongodb.com/docs/atlas/getting-started/?utm_campaign=devrel&utm_medium=github&utm_content=mern.stack.example&utm_term=learning.fuel) and then paste your connection string into `ATLAS_URI`.
+
+Optional: seed sample data:
+
+```bash
+cd mern/server && node seed.js
+```
+
+Start the backend API:
+
+```bash
 cd mern/server
 npm install
 npm start
+```
 
-# 4) Start frontend (new terminal)
-cd ../client
+Start the frontend in a second terminal:
+
+```bash
+cd mern/client
 npm install
 npm run dev
 ```
 
 Open `http://localhost:5173`.
-
-## MongoDB Atlas Setup
-
-### Configure server environment
-
-Update `mern/server/config.env`:
-
-```env
-ATLAS_URI=mongodb://admin:mongodb@mongodb:27017/
-PORT=5050
-```
-
-If you're running the database locally in the devcontainer, keep the configured connection string.
-
-You may also connect to an Atlas cluster. If you're new to Atlas, follow the [quick start guide](https://www.mongodb.com/docs/atlas/getting-started/?utm_campaign=devrel&utm_medium=github&utm_content=mern.stack.example&utm_term=learning.fuel) and then update `ATLAS_URI` with your connection string.
-
-### Seed sample data (optional)
-
-```bash
-cd mern/server
-node seed.js
-```
-
-### Run services
-
-Backend:
-
-```bash
-cd mern/server
-npm install
-npm start
-```
-
-Frontend:
-
-```bash
-cd mern/client
-npm run dev
-```
 
 ## GitHub Codespaces and Dev Containers
 
@@ -166,6 +163,11 @@ Example request body for create or update:
 ### Port already in use
 
 - Change `PORT` in `mern/server/config.env`, or stop the process using `:5050`
+
+## Community and Support
+
+- Use [GitHub Issues](https://github.com/mongodb-developer/mern-stack-example/issues) for bugs and feature requests
+- Use [MongoDB Community Forums](https://www.mongodb.com/community/forums/) for general MongoDB questions
 
 ## Additional Resources
 
