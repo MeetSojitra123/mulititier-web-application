@@ -1,20 +1,21 @@
-# MERN Stack Employee Records App with MongoDB Atlas
+# MERN Stack Example: Employee Records App (MongoDB Atlas, Express, React, Node.js)
 
-A full-stack CRUD application built with MongoDB, Express, React, and Node.js (MERN). Demonstrates how to manage employee records — create, read, update, and delete — using MongoDB Atlas as the database and a REST API backend.
+A full-stack CRUD application built with MongoDB, Express, React, and Node.js (MERN).
 
-Companion code for the [MERN Stack Tutorial](https://www.mongodb.com/languages/mern-stack-tutorial?utm_campaign=devrel&utm_medium=github&utm_content=mern.stack.example&utm_term=learning.fuel).
+Companion code for the [MERN Stack Tutorial](https://www.mongodb.com/languages/mern-stack-tutorial?utm_campaign=devrel&utm_medium=github&utm_content=mern.stack.example&utm_term=learning.fuel) and [video walkthrough](https://www.youtube.com/watch?v=4nKWREmCvsE).
 
 [![CI](https://github.com/mongodb-developer/mern-stack-example/actions/workflows/main.yaml/badge.svg)](https://github.com/mongodb-developer/mern-stack-example/actions/workflows/main.yaml)
 
-## Features
+## MERN Stack Architecture
 
-- List all employee records stored in MongoDB Atlas
-- Create a new employee record (name, position, level)
-- Edit an existing record in place
-- Delete a record
-- React frontend (Vite + Tailwind CSS) communicating with an Express REST API
+This project demonstrates an employee record tracker:
 
-## Architecture Overview
+- Create records
+- Read records from MongoDB Atlas
+- Update records
+- Delete records
+
+The React app in `mern/client` calls an Express API in `mern/server`, and data is stored in MongoDB Atlas.
 
 ```
 ┌─────────────────────┐       REST (JSON)      ┌──────────────────────────┐
@@ -31,34 +32,66 @@ Companion code for the [MERN Stack Tutorial](https://www.mongodb.com/languages/m
                                                └──────────────────────────┘
 ```
 
-- **Frontend**: React 18, Vite, Tailwind CSS, React Router
-- **Backend**: Node.js, Express 4, MongoDB Node.js Driver 6
-- **Database**: MongoDB Atlas — `employees` database, `records` collection
+Stack:
+
+- Frontend: React 18, Vite, Tailwind CSS, React Router
+- Backend: Node.js, Express 4, MongoDB Node.js Driver 6
+- Database: MongoDB Atlas (`employees.records` collection)
+
+## Prerequisites
+
+- Node.js 20+
+- npm 9+
+- A free [MongoDB Atlas](https://www.mongodb.com/atlas?utm_campaign=devrel&utm_medium=github&utm_content=mern.stack.example&utm_term=learning.fuel) cluster
 
 ## Quick Start
 
-### Prerequisites
+```bash
+# 1) Clone
+git clone https://github.com/mongodb-developer/mern-stack-example.git
+cd mern-stack-example
 
-- Node.js 20+ (required for `node --env-file` support)
-- A free [MongoDB Atlas](https://www.mongodb.com/atlas?utm_campaign=devrel&utm_medium=github&utm_content=mern.stack.example&utm_term=learning.fuel) cluster
+# 2) Configure environment
+cp mern/server/config.env.example mern/server/config.env
 
-### 1. Configure the server
+# 3) Start API server
+cd mern/server
+npm install
+npm start
 
-Create `mern/server/config.env`:
-
+# 4) Start frontend (new terminal)
+cd ../client
+npm install
+npm run dev
 ```
-ATLAS_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/
+
+Open `http://localhost:5173`.
+
+## MongoDB Atlas Setup
+
+### Configure server environment
+
+Update `mern/server/config.env`:
+
+```env
+ATLAS_URI=mongodb://admin:mongodb@mongodb:27017/
 PORT=5050
 ```
 
-### 2. Seed the database (optional)
+If you're running the database locally in the devcontainer, keep the configured connection string.
+
+You may also connect to an Atlas cluster. If you're new to Atlas, follow the [quick start guide](https://www.mongodb.com/docs/atlas/getting-started/?utm_campaign=devrel&utm_medium=github&utm_content=mern.stack.example&utm_term=learning.fuel) and then update `ATLAS_URI` with your connection string.
+
+### Seed sample data (optional)
 
 ```bash
 cd mern/server
 node seed.js
 ```
 
-### 3. Start the API server
+### Run services
+
+Backend:
 
 ```bash
 cd mern/server
@@ -66,34 +99,40 @@ npm install
 npm start
 ```
 
-### 4. Start the React app
+Frontend:
 
 ```bash
 cd mern/client
-npm install
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173).
+## GitHub Codespaces and Dev Containers
 
-## Quick Start with GitHub Codespaces or Dev Containers
-
-New to the repo? **Use Codespaces for the fastest setup**:
+GitHub Codespaces is an easy and fast way to get this project running without installing anything locally. It uses a dev container, which is a Docker environment configured for development.
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/mongodb-developer/mern-stack-example?quickstart=1)
 
-Or use VS Code Dev Containers locally (requires [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)):
+## REST API Endpoints
 
-1. Clone the repo
-2. Run: `Ctrl+Shift+P` → "Dev Containers: Reopen in Container"
-3. Wait for setup to complete (MongoDB + dependencies install automatically)
-4. Run both services:
-   ```bash
-   # Terminal 1: npm start (from mern/server)
-   # Terminal 2: npm run dev (from mern/client)
-   ```
+Base URL: `http://localhost:5050`
 
-MongoDB (Atlas Local) and all dependencies are automatically configured. See [`.devcontainer/README.md`](.devcontainer/README.md) for details.
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/record` | Retrieve all records |
+| `GET` | `/record/:id` | Retrieve one record by ID |
+| `POST` | `/record` | Create a record |
+| `PATCH` | `/record/:id` | Update a record |
+| `DELETE` | `/record/:id` | Delete a record |
+
+Example request body for create or update:
+
+```json
+{
+   "name": "Jane Smith",
+   "position": "Developer",
+   "level": "Senior"
+}
+```
 
 ## MongoDB Features Demonstrated
 
@@ -101,13 +140,43 @@ MongoDB (Atlas Local) and all dependencies are automatically configured. See [`.
 |---|---|
 | [MongoDB Node.js Driver](https://www.mongodb.com/docs/drivers/node/current/?utm_campaign=devrel&utm_medium=github&utm_content=mern.stack.example&utm_term=learning.fuel) | `mern/server/db/connection.js` |
 | [CRUD operations](https://www.mongodb.com/docs/manual/crud/?utm_campaign=devrel&utm_medium=github&utm_content=mern.stack.example&utm_term=learning.fuel) | `mern/server/routes/record.js` |
-| [MongoDB Atlas](https://www.mongodb.com/atlas?utm_campaign=devrel&utm_medium=github&utm_content=mern.stack.example&utm_term=learning.fuel) | Atlas URI in `config.env` |
-| [Server API version](https://www.mongodb.com/docs/manual/reference/stable-api/?utm_campaign=devrel&utm_medium=github&utm_content=mern.stack.example&utm_term=learning.fuel) | `ServerApiVersion.v1` in connection |
+| [MongoDB Atlas](https://www.mongodb.com/atlas?utm_campaign=devrel&utm_medium=github&utm_content=mern.stack.example&utm_term=learning.fuel) | `ATLAS_URI` in `config.env` |
+| [Server API version](https://www.mongodb.com/docs/manual/reference/stable-api/?utm_campaign=devrel&utm_medium=github&utm_content=mern.stack.example&utm_term=learning.fuel) | `ServerApiVersion.v1` in `connection.js` |
+
+## Troubleshooting
+
+### Cannot connect to MongoDB Atlas
+
+- Verify `ATLAS_URI` in `mern/server/config.env`
+- Confirm your database user credentials are correct in `mern/server/config.env`
+- Confirm your IP is in [Atlas Network Access](https://www.mongodb.com/docs/atlas/security/ip-access-list/?utm_campaign=devrel&utm_medium=github&utm_content=mern.stack.example&utm_term=learning.fuel)
+
+### Backend fails to start
+
+- Check Node version: `node --version`
+- Confirm `mern/server/config.env` exists
+- Reinstall dependencies in `mern/server`: `npm install`
+
+### Frontend shows empty data
+
+- Confirm backend is running on `:5050`
+- Open browser dev tools and check network requests
+- Confirm records exist in Atlas (or run `node seed.js` in the server folder)
+
+### Port already in use
+
+- Change `PORT` in `mern/server/config.env`, or stop the process using `:5050`
 
 ## Additional Resources
 
-- [MERN Stack Tutorial](https://www.mongodb.com/languages/mern-stack-tutorial?utm_campaign=devrel&utm_medium=github&utm_content=mern.stack.example&utm_term=learning.fuel) — step-by-step walkthrough of this codebase
+- [MERN Stack Tutorial](https://www.mongodb.com/languages/mern-stack-tutorial?utm_campaign=devrel&utm_medium=github&utm_content=mern.stack.example&utm_term=learning.fuel)
+- [MongoDB Atlas Docs](https://www.mongodb.com/docs/atlas?utm_campaign=devrel&utm_medium=github&utm_content=mern.stack.example&utm_term=learning.fuel)
+- [MongoDB Node.js Driver Docs](https://www.mongodb.com/docs/drivers/node/current/?utm_campaign=devrel&utm_medium=github&utm_content=mern.stack.example&utm_term=learning.fuel)
+
+## License
+
+[Apache 2.0](LICENSE)
 
 ## Disclaimer
 
-Use at your own risk; not a supported MongoDB product
+This repository is for educational use and is not a supported MongoDB product.
