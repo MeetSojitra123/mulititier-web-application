@@ -1,14 +1,12 @@
-name: Production Deployment Pipeline
+name: Production Multi-Tier Deployment
 
 on:
   push:
     branches:
-      - main  # Triggers the pipeline automatically when you push to the main branch
+      - main  # Triggers the pipeline when you push to the main branch
 
 jobs:
-  # -------------------------------------------------------
-  # JOB 1: BUILD & DEPLOY FRONTEND TO S3 + CLOUDFRONT
-  # -------------------------------------------------------
+  # --- JOB 1: BUILD & DEPLOY FRONTEND ---
   deploy-frontend:
     runs-on: ubuntu-latest
     steps:
@@ -20,7 +18,7 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Install & Build Frontend
+      - name: Install & Build Client
         run: |
           cd client
           npm install
@@ -31,9 +29,9 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-south-1  # Change to your AWS region if different
+          aws-region: ap-south-1  # Mumbai region matching your S3 setup
 
-      - name: Sync Files to S3 Bucket
+      - name: Sync Static Assets to S3
         run: |
           aws s3 sync ./client/dist s3://multitier-frontend --delete
 
@@ -41,32 +39,30 @@ jobs:
         run: |
           aws cloudfront create-invalidation --distribution-id E1GC1HVLKVJ56U --paths "/*"
 
-  # -------------------------------------------------------
-  # JOB 2: PULL & RESTART BACKEND ON EC2
-  # -------------------------------------------------------
+  # --- JOB 2: UPDATE EC2 BACKEND ---
   deploy-backend:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: SSH into EC2 & Update Server
+      - name: SSH into EC2 & Restart Server
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # Navigate to repo folder
-            cd ~/mern-stack-example
+            # Navigate to the cloned repository on your EC2
+            cd ~/mulititier-web-application
             
-            # Reset local changes and pull newest code from github
+            # Pull down the latest code changes securely
             git fetch --all
             git reset --hard origin/main
             
-            # Update backend dependencies
+            # Install backend production dependencies
             cd server
             npm install --production
             
-            # Restart backend process via PM2
+            # Cleanly restart the backend service using PM2
             pm2 restart all || pm2 start server.js --name "mern-backend"
