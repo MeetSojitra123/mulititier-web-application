@@ -1,0 +1,72 @@
+name: Production Deployment Pipeline
+
+on:
+  push:
+    branches:
+      - main  # Triggers the pipeline automatically when you push to the main branch
+
+jobs:
+  # -------------------------------------------------------
+  # JOB 1: BUILD & DEPLOY FRONTEND TO S3 + CLOUDFRONT
+  # -------------------------------------------------------
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install & Build Frontend
+        run: |
+          cd client
+          npm install
+          npm run build
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1  # Change to your AWS region if different
+
+      - name: Sync Files to S3 Bucket
+        run: |
+          aws s3 sync ./client/dist s3://multitier-frontend --delete
+
+      - name: Invalidate CloudFront Cache
+        run: |
+          aws cloudfront create-invalidation --distribution-id E1GC1HVLKVJ56U --paths "/*"
+
+  # -------------------------------------------------------
+  # JOB 2: PULL & RESTART BACKEND ON EC2
+  # -------------------------------------------------------
+  deploy-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: SSH into EC2 & Update Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # Navigate to repo folder
+            cd ~/mern-stack-example
+            
+            # Reset local changes and pull newest code from github
+            git fetch --all
+            git reset --hard origin/main
+            
+            # Update backend dependencies
+            cd server
+            npm install --production
+            
+            # Restart backend process via PM2
+            pm2 restart all || pm2 start server.js --name "mern-backend"
